@@ -25,12 +25,12 @@ export class StudentApi {
 
         registerRequestMapping(StudentApi, "/students", RequestMethod.POST,
             [
-                new RequestBody("student", DataType.object, AddStudentDto, "新学生"),
+                new RequestBody("student", DataType.OBJECT, AddStudentDto, "新学生"),
             ],
             [
-                new Response(HttpStatusCode.OK, DataType.string, "新学生ID"),
-                new Response(HttpStatusCode.INTERNAL_SERVER_ERROR, DataType.string, "内部错误"),
-                new Response(HttpStatusCode.CONFLICT, DataType.string, "学生姓名冲突"),
+                new Response(HttpStatusCode.OK, DataType.STRING, "新学生ID"),
+                new Response(HttpStatusCode.INTERNAL_SERVER_ERROR, DataType.STRING, "内部错误"),
+                new Response(HttpStatusCode.CONFLICT, DataType.STRING, "学生姓名冲突"),
             ],
             "添加新学生");
         route.post("/", (req, res, next) => {
@@ -63,12 +63,12 @@ export class StudentApi {
 
         registerRequestMapping(StudentApi, "/students/{id}", RequestMethod.DELETE,
             [
-                new PathVariable("id", DataType.string, "学生ID"),
+                new PathVariable("id", DataType.STRING, "学生ID"),
             ],
             [
-                new Response(HttpStatusCode.OK, DataType.string, "ok"),
-                new Response(HttpStatusCode.INTERNAL_SERVER_ERROR, DataType.string, "内部错误"),
-                new Response(HttpStatusCode.NOT_FOUND, DataType.string, "学生未找到"),
+                new Response(HttpStatusCode.OK, DataType.STRING, "ok"),
+                new Response(HttpStatusCode.INTERNAL_SERVER_ERROR, DataType.STRING, "内部错误"),
+                new Response(HttpStatusCode.NOT_FOUND, DataType.STRING, "学生未找到"),
             ],
             "删除学生");
         route.delete("/:id", (req, res, next) => {
@@ -91,13 +91,13 @@ export class StudentApi {
 
         registerRequestMapping(StudentApi, "/students/{id}", RequestMethod.PUT,
             [
-                new PathVariable("id", DataType.string, "学生ID"),
-                new RequestBody("student", DataType.object, UpdateStudentDto, "学生"),
+                new PathVariable("id", DataType.STRING, "学生ID"),
+                new RequestBody("student", DataType.OBJECT, UpdateStudentDto, "学生"),
             ],
             [
-                new Response(HttpStatusCode.OK, DataType.string, "ok"),
-                new Response(HttpStatusCode.INTERNAL_SERVER_ERROR, DataType.string, "内部错误"),
-                new Response(HttpStatusCode.NOT_FOUND, DataType.string, "学生未找到"),
+                new Response(HttpStatusCode.OK, DataType.STRING, "ok"),
+                new Response(HttpStatusCode.INTERNAL_SERVER_ERROR, DataType.STRING, "内部错误"),
+                new Response(HttpStatusCode.NOT_FOUND, DataType.STRING, "学生未找到"),
             ],
             "修改学生");
         route.put("/:id", (req, res, next) => {
@@ -125,7 +125,7 @@ export class StudentApi {
 
         registerRequestMapping(StudentApi, "/students", RequestMethod.GET, [],
             [
-                new Response(HttpStatusCode.OK, DataType.array, Student, "所有学生"),
+                new Response(HttpStatusCode.OK, DataType.ARRAY, Student, "所有学生"),
             ],
             "获取所有学生");
         route.get("/", (req, res, next) => {
@@ -140,7 +140,7 @@ export class StudentApi {
     }
 
     public deleteStudent(id: string): void {
-        const index = this.students.map((x) =>  x.uuid).indexOf(id);
+        const index = this.students.map((x) => x.uuid).indexOf(id);
         this.students.splice(index, 1);
     }
 
