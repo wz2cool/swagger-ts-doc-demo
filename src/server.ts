@@ -30,7 +30,7 @@ export class Server {
     }
 
     private initSwagger(): void {
-        registerApiModel(Student);
+        // registerApiModel(Student);
         const options = new SwaggerOptions();
         options.info = new SwaggerInfoProperty();
         options.info.version = "1.0.0";

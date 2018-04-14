@@ -11,6 +11,7 @@ import {
     Response,
 } from "swagger-ts-doc";
 import { AddStudentDto } from "../model/dto/addStudentDto";
+import { UpdateStudentDto } from "../model/dto/updateStudentDto";
 import { Student } from "../model/entity/student";
 
 export class StudentApi {
@@ -60,35 +61,76 @@ export class StudentApi {
             res.json(newOne.uuid);
         });
 
-        // registerRequestMapping(StudentApi, "/students/{id}", RequestMethod.DELETE, [
-        //     new PathVariable("id", DataType.integer, "学生ID"),
-        // ], new ResponseBody(DataType.string));
-        // route.delete("/:id", (req, res, next) => {
-        //     const id = req.params.id;
-        //     this.deleteStudent(id);
-        //     res.json("");
-        // });
+        registerRequestMapping(StudentApi, "/students/{id}", RequestMethod.DELETE,
+            [
+                new PathVariable("id", DataType.string, "学生ID"),
+            ],
+            [
+                new Response(HttpStatusCode.OK, DataType.string, "ok"),
+                new Response(HttpStatusCode.INTERNAL_SERVER_ERROR, DataType.string, "内部错误"),
+                new Response(HttpStatusCode.NOT_FOUND, DataType.string, "学生未找到"),
+            ],
+            "删除学生");
+        route.delete("/:id", (req, res, next) => {
+            const id = req.params.id;
+            if (!id) {
+                res.status(HttpStatusCode.INTERNAL_SERVER_ERROR);
+                res.json("学生ID不能为空");
+                return;
+            }
 
-        // registerRequestMapping(StudentApi, "/students/{id}", RequestMethod.PUT, [
-        //     new PathVariable("id", DataType.integer, "学生ID"),
-        //     new RequestBody("student", DataType.object, Student, "学生"),
-        // ], new ResponseBody(DataType.string));
-        // route.put("/:id", (req, res, next) => {
-        //     const id = req.params.id;
-        //     const input = MappingProvider.toDtoObject<Student>(Student, req.body);
-        //     input.id = id;
-        //     this.modifyStudent(input);
-        //     res.json("");
-        // });
+            if (lodash.findIndex(this.students, (x) => x.uuid === id) < 0) {
+                res.status(HttpStatusCode.NOT_FOUND);
+                res.json(`未能找到学生`);
+                return;
+            }
 
-        // registerRequestMapping(
-        //     StudentApi,
-        //     "/students",
-        //     RequestMethod.GET, [],
-        //     new ResponseBody(DataType.array, Student, "return all students"));
-        // route.get("/", (req, res, next) => {
-        //     res.json(this.getStudents());
-        // });
+            this.deleteStudent(id);
+            res.json("ok");
+        });
+
+        registerRequestMapping(StudentApi, "/students/{id}", RequestMethod.PUT,
+            [
+                new PathVariable("id", DataType.string, "学生ID"),
+                new RequestBody("student", DataType.object, UpdateStudentDto, "学生"),
+            ],
+            [
+                new Response(HttpStatusCode.OK, DataType.string, "ok"),
+                new Response(HttpStatusCode.INTERNAL_SERVER_ERROR, DataType.string, "内部错误"),
+                new Response(HttpStatusCode.NOT_FOUND, DataType.string, "学生未找到"),
+            ],
+            "修改学生");
+        route.put("/:id", (req, res, next) => {
+            const input = req.body;
+            const id = req.params.id;
+            if (!id) {
+                res.status(HttpStatusCode.INTERNAL_SERVER_ERROR);
+                res.json("学生ID不能为空");
+                return;
+            }
+
+            if (lodash.findIndex(this.students, (x) => x.uuid === id) < 0) {
+                res.status(HttpStatusCode.NOT_FOUND);
+                res.json(`未能找到学生`);
+                return;
+            }
+
+            const student = new Student();
+            student.uuid = id;
+            student.name = input.name;
+            student.age = input.age;
+            this.modifyStudent(student);
+            res.json("ok");
+        });
+
+        registerRequestMapping(StudentApi, "/students", RequestMethod.GET, [],
+            [
+                new Response(HttpStatusCode.OK, DataType.array, Student, "所有学生"),
+            ],
+            "获取所有学生");
+        route.get("/", (req, res, next) => {
+            res.json(this.getStudents());
+        });
 
         return route;
     }
@@ -97,22 +139,20 @@ export class StudentApi {
         this.students.push(newOne);
     }
 
-    // public deleteStudent(id: number): void {
-    //     this.students = lodash.remove(this.students, (x: Student) => {
-    //         return x.id === id;
-    //     });
-    // }
+    public deleteStudent(id: string): void {
+        const index = this.students.map((x) =>  x.uuid).indexOf(id);
+        this.students.splice(index, 1);
+    }
 
-    // public modifyStudent(s: Student): void {
-    //     this.students = lodash.remove(this.students, (x: Student) => {
-    //         return x.id === s.id;
-    //     });
-    //     this.students.push(s);
-    // }
+    public modifyStudent(s: Student): void {
+        const matchStudent = lodash.find(this.students, (x) => x.uuid === s.uuid);
+        matchStudent.name = s.name || matchStudent.name;
+        matchStudent.age = s.age || matchStudent.age;
+    }
 
-    // public getStudents(): Student[] {
-    //     return this.students;
-    // }
+    public getStudents(): Student[] {
+        return this.students;
+    }
 
     private uuid(): string {
         const s = [];
