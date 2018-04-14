@@ -4,6 +4,8 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "tsc",
+    "start": "npm run build && node dist\\bin\\www.js",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
